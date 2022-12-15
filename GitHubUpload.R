@@ -58,18 +58,27 @@ STCor <- cor(STData)
 MixedCor <- cor(MixedData)
 INVCor <- cor(INVData) #In cor(INVData) : the standard deviation is zero
 
-'~~~Heatmaps with correlation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-melted_STCor <- melt(STCor)
-ggplot(data = melted_STCor, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()
+'~~~Priminitive Heatmaps~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' 
+heatmap(AllCor) #<- just using the correlation for all data
 
-melted_MixedCor <- melt(MixedCor)
-ggplot(data = melted_MixedCor, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()
+AllPhenoScaled <- scale(AllPhenonarrow)
+AllPhenoScaledCor <- cor(AllPhenoScaled)
+Heatmap <- heatmap(AllPhenoScaledCor)
 
-melted_INVCor <- melt(INVCor)
-ggplot(data = melted_INVCor, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()
+'~~~Modulated Modularity Clustering Heatmaps ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' 
+library("pheatmap")
+library("dendsort")
+
+pheatmap(AllCor,fontsize = 3) #<- using non-scaled data (CORRECT)
+
+pheatmap(AllCor,fontsize = 3, kmeans_k = 30) #<- interesting, provides a customizeable horizontal number of vertices 
+
+
+callback = function(hc,...){dendsort(hc)}
+
+pheatmap(AllCor,fontsize = 3, clustering_callback = callback)
+STCorHeatmap <- pheatmap(STCor,fontsize = 2, clustering_callback = callback) 
+INVCorHeatmap <- pheatmap(INVCor,fontsize = 2, clustering_callback = callback) #<- there are NAs
 
 '~~~Creating Histograms ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 STScaled <- scale(STData) #normalizes with a mean of 0 and a variance of 1 (standardization)
@@ -154,28 +163,6 @@ par(mar=rep(.1, 4))
 
 INVCorCeb <- cluster_edge_betweenness(INVCorNet) # shows correlations between phenotypes, pretty(ier)
 plot(INVCorCeb, INVCorNet)
-
-'~~~Priminitive Heatmaps~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' 
-heatmap(AllCor) #<- just using the correlation for all data
-
-AllPhenoScaled <- scale(AllPhenonarrow)
-AllPhenoScaledCor <- cor(AllPhenoScaled)
-Heatmap <- heatmap(AllPhenoScaledCor)
-
-'~~~Modulated Modularity Clustering Heatmaps ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' 
-library("pheatmap")
-library("dendsort")
-
-pheatmap(AllCor,fontsize = 3) #<- using non-scaled data (CORRECT)
-
-pheatmap(AllCor,fontsize = 3, kmeans_k = 30) #<- interesting, provides a customizeable horizontal number of vertices 
-
-
-callback = function(hc,...){dendsort(hc)}
-
-pheatmap(AllCor,fontsize = 3, clustering_callback = callback)
-STCorHeatmap <- pheatmap(STCor,fontsize = 2, clustering_callback = callback) 
-INVCorHeatmap <- pheatmap(INVCor,fontsize = 2, clustering_callback = callback) #<- there are NAs
 
 '~~~PCA tables~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 ##Creating PCA plots
