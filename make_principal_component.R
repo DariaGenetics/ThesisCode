@@ -22,18 +22,6 @@
 ### impute
   AllPhenoPCA1 = imputePCA(AllPhenoWOInversionStatus, scale.unit=TRUE, ncp=5, graph=T)
 
-### check - is the output of this function the PC or the imputed data?
-  str(AllPhenoPCA1)
-  table(apply(AllPhenoWOInversionStatus, 1, function(x) mean(is.na(x))))
-
-
-  apply(AllPhenoPCA1$completeObs, 2, function(x) mean(is.na(x)))
-  table(apply(AllPhenoPCA1$fittedX, 2, function(x) mean(is.na(x))))
-
-  plot(AllPhenoPCA1$completeObs[,200] ~ AllPhenoPCA1$fittedX[,200])
-  plot(AllPhenoWOInversionStatus[,200]$StarvationResistance_standard_male ~ AllPhenoPCA1$completeObs[,200])
-  plot(AllPhenoWOInversionStatus[,200]$StarvationResistance_standard_male ~ AllPhenoPCA1$fittedX[,200])
-
 ###run PCA
   pc <- PCA(AllPhenoPCA1, ncp=250)
   dim(pc$ind$coord)

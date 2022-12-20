@@ -6,11 +6,11 @@
   library(boot)
   library(doMC)
   registerDoMC(4)
+  library(patchwork)
 
 ### load data
   load("/Users/alanbergland/Documents/GitHub/ThesisCode/pca_output.Rdata")
 
-  PrincipleComponentsTrimmed <- fread("/Users/alanbergland/Documents/GitHub/ThesisCode/PrincipleComponentsWOLastFourRows.csv")
   MeltedPrincipleComponents <- as.data.table(melt(pc_out,
                                                   id.var = c("ral_id","In2Lt"),
                                                   variable.name = "PC", value.name="ComponentValues"))
@@ -38,6 +38,14 @@
   }
   A[,pa:=p.adjust(p)]
 
+  r2_plot <-
+  ggplot(data=A, aes(x=PC, y=r2)) +
+  geom_segment(aes(x=PC, xend=PC, y=uci, yend=lci)) +
+  geom_point() +
+  geom_point(data=A[p<.05], aes(x=PC, y=r2), color="red") +
+  geom_point(data=A[pa<.1], aes(x=PC, y=r2), color="blue")
+
+
 ### which factors contribute to Dim.8?
   loading <- as.data.table(pc$var$coord)
   loading[,pheno:=row.names(pc$var$coord)]
@@ -49,7 +57,8 @@
   setkey(ll.rank, variable, pheno)
   ll <- merge(ll, ll.rank)
 
-  phenoLoad <- ggplot(data=ll[variable=="Dim.8"][quan>.9]) +
+  phenoLoad <-
+  ggplot(data=ll[variable=="Dim.8"][quan>.9]) +
   geom_segment(aes(y=rank(rank), yend=rank(rank), x=0, xend=value)) +
   geom_text(data=ll[variable=="Dim.8"][quan>.9],
               aes(y=rank(rank), x=.5, label=pheno), hjust=0, size=2) +
@@ -62,17 +71,19 @@
                               list(In2Lt, PC)]
   pc.ag[,se:=sd/sqrt(n)]
 
-  ggplot(data=pc.ag[PC=="Dim.8"], aes(x=In2Lt, y=mu)) +
+  effect_plot <- ggplot(data=pc.ag[PC=="Dim.8"], aes(x=In2Lt, y=mu)) +
   geom_point() +
   geom_segment(aes(x=In2Lt, xend=In2Lt, y=mu-2*se, yend=mu+2*se))
 
 
+### mega plot
+  layout <- "
+  AAAA
+  BBCC"
 
-ggplot(data=A, aes(x=PC, y=r2)) +
-geom_segment(aes(x=PC, xend=PC, y=uci, yend=lci)) +
-geom_point() +
-geom_point(data=A[p<.05], aes(x=PC, y=r2), color="red") +
-geom_point(data=A[pa<.1], aes(x=PC, y=r2), color="blue")
+  r2_plot + phenoLoad + effect_plot +
+  plot_layout(design=layout) + plot_annotation(level="A")
+
 
 
 

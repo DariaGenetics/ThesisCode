@@ -247,11 +247,14 @@ PrincipleComponents2$In2LtStatus <- In2LtStatus
 write_xlsx(PrincipleComponents,"/Users/dgg/Desktop/PrincipleComponents.xlsx")
 
 PrincipleComponentsTrimmed <- fread("/Users/dgg/Desktop/PrincipleComponentsWOLastFourRows.csv") #extra 3 rows removed
-MeltedPrincipleComponents <- as.data.table(melt(PrincipleComponentsTrimmed, id.variables = c("RalId","In2LtStatus"), variable.name = "PC", value.name="ComponentValues"))
+PrincipleComponentsTrimmed <- fread("/Users/alanbergland/Documents/GitHub/ThesisCode/PrincipleComponentsWOLastFourRows.csv")
+MeltedPrincipleComponents <- as.data.table(melt(PrincipleComponentsTrimmed,
+                                                id.var = c("RalId","In2LtStatus"),
+                                                variable.name = "PC", value.name="ComponentValues"))
 
 AttemptV1 <- lm(V1 ~ In2LtStatus, data = PrincipleComponentsTrimmed)
 
-A <- foreach(i=1:20) %do% {
+A <- foreach(i=1:230) %do% {
    #i = 1
 
    #X <- lm(ComponentValues ~ In2LtStatus, data = MeltedPrincipleComponents[PC == paste("V", i, sep = "")]) #intercept = INV data
