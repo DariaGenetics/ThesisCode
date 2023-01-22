@@ -58,4 +58,4 @@ tar -czvf /scratch/aob2x/gwas.test.tar.gz \
 /project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/*/Weight_LowGlucoseDiet_male*/*txt \
 /project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/*/Weight_PooledDiets_male*/*txt \
 /project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/*/WingCentroidSize_standard_female*/*txt \
-/project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/*/WingCentroidSize_standard_male*/*txt \
+/project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/*/WingCentroidSize_standard_male*/*txt
