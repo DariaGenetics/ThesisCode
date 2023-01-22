@@ -81,10 +81,11 @@
   AAAA
   BBCC"
 
+  mega <-
   r2_plot + phenoLoad + effect_plot +
-  plot_layout(design=layout) + plot_annotation(level="A")
+  plot_layout(design=layout) + plot_annotation(tag_level="A")
 
-
+  ggsave(mega, file="/Users/alanbergland/Documents/GitHub/ThesisCode/PC_example.pdf", h=6, w=12)
 
 
 
