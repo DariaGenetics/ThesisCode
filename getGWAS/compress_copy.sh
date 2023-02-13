@@ -11,6 +11,7 @@
 #SBATCH --account berglandlab_standard
 
 # sbatch ~/ThesisCode/getGWAS/compress_copy.sh
+# sacct -j 46191468
 
 tar -czvf /scratch/aob2x/gwas.test.tar.gz \
 /project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/*/ChillComaRecoveryTime_standard_female*/*txt \
