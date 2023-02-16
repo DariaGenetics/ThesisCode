@@ -16,29 +16,34 @@ setwd("/Users/alanbergland/Daria Pheno")
 VectorOfPheno<- list.files("/Users/alanbergland/Daria Pheno")
 
 PhenoGather <- foreach(i=1:length(VectorOfPheno)) %dopar% {
+
   #i = 1
   #setwd("/Users/dgg/Desktop/Thesis/GWAS STUFF/project/berglandlab/Yang_Adam/YangsGWAS/GWAS_withoutGRMs/Dariaphenotypes")
   setwd("/Users/alanbergland/Daria Pheno")
 
+
   #data = VectorOfPheno[i] #set data
   #data = as.data.table(read.delim(data)) #loads data
-  data <- fread(VectorOfPheno[i])
+  data1 <- fread(VectorOfPheno[1])
+  data1[,rnp_1:=rank(PVAL)/(length(PVAL)+1)]
+  data1[,pos_bin:=round(POS, -4)]
 
+  data1[CHR =="2L" & POS <= 13154180 & POS >= 2225744, inv:="2Lt"]
+  data1[CHR =="2L" & is.na(inv), inv:="outside-2Lt"]
+  data1[CHR =="3R" & POS <= 29031297 & POS >= 21406917, inv:="3RMo"]
+  data1[CHR =="3R" & is.na(inv), inv:="outside-3RMo"]
 
-  #data[,pa:=p.adjust(PVAL)]
-  #data = subset(data, PVAL < 0.05)
-  #data = subset(data, CHR == "2L"| CHR =="3R")
+  data2 <- fread(VectorOfPheno[2])
+  data2[,rnp_2:=rank(PVAL)/(length(PVAL)+1)]
+  data2[,pos_bin:=round(POS, -4)]
 
-  data[,rnp:=rank(PVAL)/(length(PVAL)+1)]
-  data[,pos_bin:=round(POS, -4)]
+  setkey(data1, "CHR", "POS")
+  setkey(data2, "CHR", "POS")
 
-  data[CHR =="2L" & POS <= 13154180 & POS >= 2225744, inv:="2Lt"]
-  data[CHR =="2L" & is.na(inv), inv:="outside-2Lt"]
-  data[CHR =="3R" & POS <= 29031297 & POS >= 21406917, inv:="3RMo"]
-  data[CHR =="3R" & is.na(inv), inv:="outside-3RMo"]
+  data <- merge(data1, data2)
 
-  #data2 <- data[,list(nTop = c(mean(rnp < 0.001)), thr = c(0.001), n=length(rnp)), list(CHR, PVAL, pa, rnp, pos_bin, inv)]
-  data2 <- data[,list(nTop = c(mean(rnp < 0.001)), thr = c(0.001), n=length(rnp)), list(CHR, pos_bin, inv)]
+  data2 <- data[,list(nTop = mean(rnp_1 < 0.05 & rnp_2 < .05), thr = c(0.05^2), n=length(rnp_1), eq=mean(rnp_1==rnp_2)),
+                list(CHR, pos_bin=pos_bin.x, inv)]
 
   data2[,p:=pbinom(nTop*n, n, thr, lower.tail=F)]
 
@@ -48,4 +53,6 @@ PhenoGather <- foreach(i=1:length(VectorOfPheno)) %dopar% {
 gather = rbindlist(PhenoGather)
 
 
-ggplot(data=gather, aes(x=pos_bin, y=-log10(p), color=inv)) + geom_line() + facet_grid(Phentope~CHR)
+w <- dcast()
+
+ggplot(data=data2, aes(x=pos_bin, y=-log10(p), color=inv)) + geom_line() + facet_grid(.~CHR)
